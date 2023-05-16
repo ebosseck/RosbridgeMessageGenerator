@@ -10,7 +10,7 @@ class IGenerator:
     Base Class for all code generators
     """
     def __init__(self):
-        pass
+        self.enabled: bool = False
 
     def getLanguage(self) -> str:
         """

@@ -89,7 +89,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QGroupBox" name="groupBox">
+           <widget class="QGroupBox" name="generator_selection_box">
             <property name="title">
              <string>Languages</string>
             </property>
@@ -100,7 +100,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QTabWidget" name="tabWidget">
+           <widget class="QTabWidget" name="generator_settings_tabs">
             <property name="currentIndex">
              <number>-1</number>
             </property>
@@ -170,7 +170,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="ResizableStackWidget" name="stackedWidget">
+       <widget class="ResizableStackWidget" name="data_provider_settings_stack">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>

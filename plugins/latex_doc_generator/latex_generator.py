@@ -3,17 +3,17 @@ from typing import List, Dict
 
 from PyQt6.QtWidgets import QWidget
 
-from .pytide_settings_widget import PytideSettingsWidget
+from .latex_settings_widget import LaTeXSettingsWidget
 from pytide_message_generator.dataprovider.message_data import MessageData
 from pytide_message_generator.generator.igenerator import IGenerator
 
 
-class PytideGenerator(IGenerator):
+class LaTeXGenerator(IGenerator):
     """
     Base Class for all code generators
     """
     def __init__(self):
-        super(PytideGenerator, self).__init__()
+        super(LaTeXGenerator, self).__init__()
         global PLUGIN_DIRECTORY
         PLUGIN_DIRECTORY = str(Path(__file__).resolve().parents[0])
 
@@ -21,13 +21,13 @@ class PytideGenerator(IGenerator):
         """
         :return: the language the generator generates messages for
         """
-        return "Python 3"
+        return "LaTeX (Docs)"
 
     def getUIWidget(self) -> QWidget:
         """
         :return: QT Widget containing additional configuration options, or empty widget if no additional configuration is needed
         """
-        return PytideSettingsWidget(PLUGIN_DIRECTORY)
+        return LaTeXSettingsWidget(PLUGIN_DIRECTORY)
 
     def generateFromWidgetSettings(self, messages: List[MessageData], settings: QWidget):
         pass
