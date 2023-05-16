@@ -18,11 +18,11 @@ class IGenerator:
         """
         return "UNDEFINED"
 
-    def getUIWidget(self):
+    def getUIWidget(self) -> QWidget:
         """
-        :return: QT UI definition of a widget containing additional configuration options, or none if no additional configuration is needed
+        :return: QT Widget containing additional configuration options, or empty widget if no additional configuration is needed
         """
-        return None
+        return QWidget()
 
     def generate(self, messages: List[MessageData], settings: Union[QWidget, Dict[str, Any]]):
         if isinstance(settings, QWidget):
