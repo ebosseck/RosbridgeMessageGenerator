@@ -1,4 +1,6 @@
-from typing import List
+from typing import List, Union, Dict, Any
+
+from PyQt6.QtWidgets import QWidget
 
 from pytide_message_generator.dataprovider.message_data import MessageData
 
@@ -22,5 +24,14 @@ class IDataProvider:
         """
         return None
 
-    def loadMessages(self, settings) -> List[MessageData]:
+    def loadMessages(self, settings: Union[QWidget, Dict[str, Any]]) -> List[MessageData]:
+        if isinstance(settings, QWidget):
+            return self.loadMessagesFromWidgetSettings(settings)
+        else:
+            return self.loadMessagesFromDictSettings(settings)
+
+    def loadMessagesFromWidgetSettings(self, settings: QWidget) -> List[MessageData]:
+        return []
+
+    def loadMessagesFromDictSettings(self, settings: Dict) -> List[MessageData]:
         return []

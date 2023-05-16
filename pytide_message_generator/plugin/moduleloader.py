@@ -17,7 +17,6 @@ def loadModulesFromPath(path: str):
         for d in lst:
             s = os.path.abspath(path) + os.sep + d
 
-
             if os.path.isdir(s):
                 if os.path.exists(s + os.sep + "__init__.py"):
                     childmod = d if module == "" else module + "." + d

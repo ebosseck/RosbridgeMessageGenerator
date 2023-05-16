@@ -9,3 +9,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         uic.loadUi('GUI/Windows/mainwindow.ui', self)
+        self.loadPlugins()
+
+    def loadPlugins(self):
+        pass

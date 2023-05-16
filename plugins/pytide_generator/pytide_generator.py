@@ -1,34 +1,32 @@
-from typing import List, Any, Dict, Union
+from pathlib import Path
+from typing import List, Dict
 
 from PyQt6.QtWidgets import QWidget
 
 from pytide_message_generator.dataprovider.message_data import MessageData
+from pytide_message_generator.generator.igenerator import IGenerator
 
 
-class IGenerator:
+class PytideGenerator(IGenerator):
     """
     Base Class for all code generators
     """
     def __init__(self):
-        pass
+        super(PytideGenerator, self).__init__()
+        global PLUGIN_DIRECTORY
+        PLUGIN_DIRECTORY = str(Path(__file__).resolve().parents[3])
 
     def getLanguage(self) -> str:
         """
         :return: the language the generator generates messages for
         """
-        return "UNDEFINED"
+        return "Python 3"
 
     def getUIWidget(self):
         """
         :return: QT UI definition of a widget containing additional configuration options, or none if no additional configuration is needed
         """
         return None
-
-    def generate(self, messages: List[MessageData], settings: Union[QWidget, Dict[str, Any]]):
-        if isinstance(settings, QWidget):
-            self.generateFromWidgetSettings(messages, settings)
-        else:
-            self.generateFromDictSettings(messages, settings)
 
     def generateFromWidgetSettings(self, messages: List[MessageData], settings: QWidget):
         pass
