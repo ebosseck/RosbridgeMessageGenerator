@@ -1,12 +1,14 @@
 import sys
 
 from PyQt6 import uic
-from PyQt6.QtWidgets import QMainWindow, QComboBox, QGroupBox, QAbstractButton, QToolButton, QCheckBox, QTabWidget
+from PyQt6.QtWidgets import QMainWindow, QComboBox, QGroupBox, QAbstractButton, QToolButton, QCheckBox, QTabWidget, \
+    QLineEdit
 
 from pytide_message_generator.dataprovider.idataprovider import IDataProvider
 from pytide_message_generator.generator.igenerator import IGenerator
 from pytide_message_generator.plugin import moduleloader
 from pytide_message_generator.settings.settings import COLUMNS_LANGUAGE_LAYOUT
+from pytide_message_generator.tools.ui_interaction_tools import setup_folder_select
 from pytide_message_generator.widgets.resizeablestackwidget import ResizableStackWidget
 
 
@@ -27,7 +29,12 @@ class MainWindow(QMainWindow):
         self.generator_selection_box: QGroupBox = None
         self.generator_settings_tabs: QTabWidget = None
 
+        self.line_out_path: QLineEdit = None
+        self.btn_select_outpath: QToolButton = None
+
         uic.loadUi('GUI/Windows/mainwindow.ui', self)
+
+        setup_folder_select(self.btn_select_outpath, self.line_out_path)
 
         self.loadPlugins()
         self.loadDataProviders()
