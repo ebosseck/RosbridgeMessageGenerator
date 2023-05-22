@@ -139,13 +139,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="btn_load_data">
-           <property name="text">
-            <string>Load</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0" colspan="3">
           <widget class="ResizableStackWidget" name="data_provider_settings_stack">
            <property name="sizePolicy">
@@ -156,6 +149,19 @@
            </property>
            <property name="currentIndex">
             <number>-1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QToolButton" name="btn_load_data">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Load</string>
            </property>
           </widget>
          </item>

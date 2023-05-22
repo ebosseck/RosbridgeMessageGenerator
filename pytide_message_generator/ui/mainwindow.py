@@ -2,7 +2,7 @@ import sys
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMainWindow, QComboBox, QGroupBox, QAbstractButton, QToolButton, QCheckBox, QTabWidget, \
-    QLineEdit
+    QLineEdit, QPushButton
 
 from pytide_message_generator.dataprovider.idataprovider import IDataProvider
 from pytide_message_generator.generator.igenerator import IGenerator
@@ -32,6 +32,12 @@ class MainWindow(QMainWindow):
         self.line_out_path: QLineEdit = None
         self.btn_select_outpath: QToolButton = None
 
+        self.btn_load_data: QToolButton = None
+        self.btn_generate: QToolButton = None
+        self.btn_select_all: QToolButton = None
+        self.btn_select_none: QToolButton = None
+
+
         uic.loadUi('GUI/Windows/mainwindow.ui', self)
 
         setup_folder_select(self.btn_select_outpath, self.line_out_path)
@@ -42,7 +48,25 @@ class MainWindow(QMainWindow):
 
         self.combo_data_source.currentIndexChanged.connect(self.onDataProviderCurrentChanged)
 
+        self.btn_load_data.clicked.connect(self.onLoadData)
+        self.btn_generate.clicked.connect(self.onGenerate)
+        self.btn_select_all.clicked.connect(self.onSelectAll)
+        self.btn_select_none.clicked.connect(self.onDeselectAll)
 
+
+    def onLoadData(self):
+        pass
+
+    def onGenerate(self):
+        pass
+
+    def onSelectAll(self):
+        pass
+
+    def onDeselectAll(self):
+        pass
+
+    #region Plugins
 
     def onDataProviderCurrentChanged(self):
         self.data_provider_settings_stack.setCurrentIndex(self.combo_data_source.currentIndex())
@@ -93,3 +117,4 @@ class MainWindow(QMainWindow):
             self.generator_settings_tabs.addTab(instance.getUIWidget(), instance.getLanguage())
 
             generatorCount += 1
+    #endregion
