@@ -1,0 +1,22 @@
+from pytidenetworking.message import Message
+
+$dependencies
+
+
+$constants
+
+class $class_name ():
+
+$constructor
+
+    #region Getters and Setters
+$accessors
+    #endregion
+
+    #region Serialization
+    def serializeToMessage(self, message: Message):
+        $message_serializer
+
+    def deserializeFromMessage(self, message: Message):
+        $message_deserializer
+    #endregion

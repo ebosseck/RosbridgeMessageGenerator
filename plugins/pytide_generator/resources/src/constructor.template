@@ -1,0 +1,7 @@
+    def __init__($args):
+        super($classname, self).__init__($superargs)
+
+        $content
+
+    def _rostype (self) -> str:
+        return "$msgID"

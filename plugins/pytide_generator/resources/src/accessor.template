@@ -1,0 +1,5 @@
+    def get$name(self) -> $type:
+        return self.$variable
+
+    def set$name(self, value: $type):
+        self.$variable = value

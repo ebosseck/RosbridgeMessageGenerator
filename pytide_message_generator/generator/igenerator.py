@@ -10,7 +10,7 @@ class IGenerator:
     Base Class for all code generators
     """
     def __init__(self):
-        self.enabled: bool = False
+        self.enabled: bool = True
 
     def getLanguage(self) -> str:
         """
@@ -24,14 +24,14 @@ class IGenerator:
         """
         return QWidget()
 
-    def generate(self, messages: List[MessageData], settings: Union[QWidget, Dict[str, Any]]):
+    def generate(self, messages: List[MessageData], messageDB: Dict[str, MessageData], path: str, settings: Union[QWidget, Dict[str, Any]]):
         if isinstance(settings, QWidget):
-            self.generateFromWidgetSettings(messages, settings)
+            self.generateFromWidgetSettings(messages, messageDB, path, settings)
         else:
-            self.generateFromDictSettings(messages, settings)
+            self.generateFromDictSettings(messages, messageDB, path, settings)
 
-    def generateFromWidgetSettings(self, messages: List[MessageData], settings: QWidget):
+    def generateFromWidgetSettings(self, messages: List[MessageData], messageDB: Dict[str, MessageData], path, settings: QWidget):
         pass
 
-    def generateFromDictSettings(self, messages: List[MessageData], settings: Dict):
+    def generateFromDictSettings(self, messages: List[MessageData], messageDB: Dict[str, MessageData], path, settings: Dict):
         pass

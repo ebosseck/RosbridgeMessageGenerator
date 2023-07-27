@@ -17,6 +17,8 @@ class LaTeXGenerator(IGenerator):
         global PLUGIN_DIRECTORY
         PLUGIN_DIRECTORY = str(Path(__file__).resolve().parents[0])
 
+        self.settingsWidget = LaTeXSettingsWidget(PLUGIN_DIRECTORY)
+
     def getLanguage(self) -> str:
         """
         :return: the language the generator generates messages for
@@ -27,10 +29,10 @@ class LaTeXGenerator(IGenerator):
         """
         :return: QT Widget containing additional configuration options, or empty widget if no additional configuration is needed
         """
-        return LaTeXSettingsWidget(PLUGIN_DIRECTORY)
+        return self.settingsWidget
 
-    def generateFromWidgetSettings(self, messages: List[MessageData], settings: QWidget):
+    def generateFromWidgetSettings(self, messages: List[MessageData], messageDB: Dict[str, MessageData], path: str, settings: QWidget):
         pass
 
-    def generateFromDictSettings(self, messages: List[MessageData], settings: Dict):
+    def generateFromDictSettings(self, messages: List[MessageData], messageDB: Dict[str, MessageData], path: str, settings: Dict):
         pass
