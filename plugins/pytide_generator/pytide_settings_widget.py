@@ -11,4 +11,8 @@ class PytideSettingsWidget(QWidget):
         self.generation_mode_combo: QComboBox = None
         self.flatten_structure_check: QCheckBox = None
 
+        self.enable_superclass_check: QCheckBox = None
+        self.super_package_edit: QLineEdit = None
+        self.super_class_edit: QLineEdit = None
+
         uic.loadUi(base_path + '/resources/gui/settingsWidget.ui', self)

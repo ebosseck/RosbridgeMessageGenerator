@@ -37,7 +37,11 @@ class PytideGenerator(IGenerator):
         settings_dict = {}
         settings_dict['base_package'] = settings.base_package_edit.text()
         settings_dict['generation_mode'] = settings.generation_mode_combo.currentIndex()
-        settings_dict['flatten_structure'] = settings.base_package_edit.text()
+        settings_dict['flatten_structure'] = settings.flatten_structure_check.isChecked()
+
+        settings_dict['common_super_class'] = settings.enable_superclass_check.isChecked()
+        settings_dict['super_class_name'] = settings.super_class_edit.text()
+        settings_dict['super_class_package'] = settings.super_package_edit.text()
 
         self.generateFromDictSettings(messages, messageDB, path, settings_dict)
 

@@ -16,7 +16,6 @@ def dark():
     return QPalette(QColor(53, 53, 53))
 
 
-
 def run():
     app = QApplication(sys.argv)
     window = MainWindow()

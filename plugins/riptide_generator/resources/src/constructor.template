@@ -1,0 +1,11 @@
+        public const string _ROS_MESSAGE_ID = "$msgID";
+
+        public $classname($args) : base($superargs)
+        {
+            $content
+        }
+
+        public $classname(Message message) : base($superargs)
+        {
+            this.deserializeFromMessage(message);
+        }

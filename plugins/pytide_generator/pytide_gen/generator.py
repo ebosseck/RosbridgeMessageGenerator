@@ -1,3 +1,4 @@
+from datetime import datetime
 from os import makedirs
 from os.path import exists
 from string import Template
@@ -35,7 +36,7 @@ PRIMITIVE_DEFAULT_VALUE_MAP = {
     "uint64": "0",
     "float32": "0",
     "float64": "0",
-    "string": "0",
+    "string": "''",
     "time": "(0, 0)",
     "duration": "(0, 0)"
 }
@@ -90,9 +91,11 @@ class CodeGenerator:
         self.messages_names.append(message.getID())
 
         variables = {
+            "timestamp": datetime.now().strftime("%d %b %Y, %H:%M:%S"),
             "dependencies": self.generateDependencies(message, messageDB, settings),
             "constants": self.generateConstants(message, messageDB, settings),
             "class_name": self.determineClassName(message, settings),
+            "superclass": settings['super_class_name'] if settings['common_super_class'] else '',
             "constructor": self.generateConstructor(message, messageDB, settings),
             "accessors": self.generateAccessors(message, messageDB, settings),
             "message_serializer": self.generateSerializers(message, messageDB, settings),
@@ -155,6 +158,9 @@ class CodeGenerator:
         if not didImportTuple:
             imports.insert(0, "from typing import List")
 
+        if settings['common_super_class']:
+            imports.append("from {} import {}".format(settings['super_class_package'], settings['super_class_name']))
+
         return '\n'.join(imports)
 
     def generateConstants(self, message: MessageData, messageDB: Dict[str, MessageData], settings: Dict) -> str:
@@ -164,7 +170,8 @@ class CodeGenerator:
                 constants.append(self.constantTemplate.substitute({
                     "name": field.field_name,
                     "type": PRIMITIVE_TYPE_MAP[field.field_type],
-                    "value": str(field.constant_value),
+                    "value": str(field.constant_value) if not isinstance(field.constant_value, str) else
+                        '"{}"'.format(field.constant_value),
                 }))
 
         return '\n'.join(constants)
@@ -266,14 +273,14 @@ class CodeGenerator:
                         serializers.append("message.putArrayLength(len(self.{}))".format(field.field_name))
 
                         serializers.append("for i in range(len(self.{})):".format(field.field_name))
-                        serializers.append("    message.addUInt(self.{}[i][0])".format(field.field_name))
-                        serializers.append("    message.addUInt(self.{}[i][1])".format(field.field_name))
+                        serializers.append("    message.putUInt32(self.{}[i][0])".format(field.field_name))
+                        serializers.append("    message.putUInt32(self.{}[i][1])".format(field.field_name))
                     elif field.field_type == 'duration':
                         serializers.append("message.putArrayLength(len(self.{}))".format(field.field_name))
 
                         serializers.append("for i in range(len(self.{})):".format(field.field_name))
-                        serializers.append("    message.addInt(self.{}[i][0])".format(field.field_name))
-                        serializers.append("    message.addInt(self.{}[i][1])".format(field.field_name))
+                        serializers.append("    message.putInt32(self.{}[i][0])".format(field.field_name))
+                        serializers.append("    message.putInt32(self.{}[i][1])".format(field.field_name))
                     else:
                         serializers.append("message.putArrayLength(len(self.{}))".format(field.field_name))
                         serializers.append("for i in range(len(self.{})):".format(field.field_name))
@@ -285,29 +292,26 @@ class CodeGenerator:
                             "message.{}Array(self.{}, includeLength=False)".format(PRIMITIVE_SERIALISATION_MAP[field.field_type],
                                                               field.field_name))
                     elif field.field_type == 'time':
-
-                        serializers.append("for i in range(len(self.{})):".format(field.field_name))
-                        serializers.append("    message.addUInt(self.{}[i][0])".format(field.field_name))
-                        serializers.append("    message.addUInt(self.{}[i][1])".format(field.field_name))
+                        serializers.append("for i in range({}):".format(field.array_fixed_length))
+                        serializers.append("    message.putUInt32(self.{}[i][0])".format(field.field_name))
+                        serializers.append("    message.putUInt32(self.{}[i][1])".format(field.field_name))
                     elif field.field_type == 'duration':
-
-                        serializers.append("for i in range(len(self.{})):".format(field.field_name))
-                        serializers.append("    message.addInt(self.{}[i][0])".format(field.field_name))
-                        serializers.append("    message.addInt(self.{}[i][1])".format(field.field_name))
+                        serializers.append("for i in range({}):".format(field.array_fixed_length))
+                        serializers.append("    message.putInt32(self.{}[i][0])".format(field.field_name))
+                        serializers.append("    message.putInt32(self.{}[i][1])".format(field.field_name))
                     else:
-
-                        serializers.append("for i in range(len(self.{})):".format(field.field_name))
+                        serializers.append("for i in range({}):".format(field.array_fixed_length))
                         serializers.append("    self.{}[i].serializeToMessage(message)".format(field.field_name))
             else:
                 if field.field_type in PRIMITIVE_SERIALISATION_MAP:
                     serializers.append("message.{}(self.{})".format(PRIMITIVE_SERIALISATION_MAP[field.field_type],
                                                                     field.field_name))
                 elif field.field_type == 'time':
-                    serializers.append("message.addUInt(self.{}[0])".format(field.field_name))
-                    serializers.append("message.addUInt(self.{}[1])".format(field.field_name))
+                    serializers.append("message.putUInt32(self.{}[0])".format(field.field_name))
+                    serializers.append("message.putUInt32(self.{}[1])".format(field.field_name))
                 elif field.field_type == 'duration':
-                    serializers.append("message.addInt(self.{}[0])".format(field.field_name))
-                    serializers.append("message.addInt(self.{}[1])".format(field.field_name))
+                    serializers.append("message.putInt32(self.{}[0])".format(field.field_name))
+                    serializers.append("message.putInt32(self.{}[1])".format(field.field_name))
                 else:
                     serializers.append("self.{}.serializeToMessage(message)".format(field.field_name))
 
@@ -317,7 +321,86 @@ class CodeGenerator:
         if len(message.fields) < 1:
             return "pass"
 
-        return "pass"
+        deserializers = []
+        for field in message.fields:
+            if field.constant_value is not None:
+                continue
+            if field.is_array:
+                if field.array_fixed_length < 0:
+                    # dynamic length array
+                    if field.field_type in PRIMITIVE_DESERIALISATION_MAP:
+                        deserializers.append("self.{} = message.{}Array()".format(field.field_name,
+                                                                                  PRIMITIVE_DESERIALISATION_MAP[field.field_type]))
+                    elif field.field_type == 'time':
+                        deserializers.append("length = message.readArrayLength()")
+
+                        deserializers.append("self.{} = []".format(field.field_name))
+                        deserializers.append("for i in range(length):")
+                        deserializers.append("    self.{}.append((message.getUInt(), message.getUInt()))".format(field.field_name))
+
+                    elif field.field_type == 'duration':
+                        deserializers.append("length = message.readArrayLength()")
+
+                        deserializers.append("self.{} = []".format(field.field_name))
+                        deserializers.append("for i in range(length):")
+                        deserializers.append("    self.{}.append((message.getInt(), message.getInt()))".format(field.field_name))
+                    else:
+                        deserializers.append("length = message.readArrayLength()")
+
+                        deserializers.append("self.{} = []".format(field.field_name))
+                        deserializers.append("for i in range(length):")
+
+                        dependentMessage = self.getMessageFromType(message, field.field_type, messageDB)
+                        type = self.determineAlias(dependentMessage, settings)
+
+                        deserializers.append("    value: {} = {}()".format(type, type))
+                        deserializers.append("    value.deserializeFromMessage(message)")
+                        deserializers.append("    self.{}.append(value)".format(field.field_name))
+                else:
+                    #fixed size array
+                    if field.field_type in PRIMITIVE_DESERIALISATION_MAP:
+                        deserializers.append("self.{} = message.{}Array(length={})".format(field.field_name,
+                                                                                  PRIMITIVE_DESERIALISATION_MAP[
+                                                                                      field.field_type],
+                                                                                           field.array_fixed_length))
+                    elif field.field_type == 'time':
+
+                        deserializers.append("self.{} = []".format(field.field_name))
+                        deserializers.append("for i in range({}):".format(field.array_fixed_length))
+                        deserializers.append(
+                            "    self.{}.append((message.getUInt(), message.getUInt()))".format(field.field_name))
+
+                    elif field.field_type == 'duration':
+                        deserializers.append("self.{} = []".format(field.field_name))
+                        deserializers.append("for i in range({}):".format(field.array_fixed_length))
+                        deserializers.append(
+                            "    self.{}.append((message.getInt(), message.getInt()))".format(field.field_name))
+                    else:
+
+                        deserializers.append("self.{} = []".format(field.field_name))
+                        deserializers.append("for i in range({}):".format(field.array_fixed_length))
+
+                        dependentMessage = self.getMessageFromType(message, field.field_type, messageDB)
+                        type = self.determineAlias(dependentMessage, settings)
+
+                        deserializers.append("    value: {} = {}()".format(type, type))
+                        deserializers.append("    value.deserializeFromMessage(message)")
+                        deserializers.append("    self.{}.append(value)".format(field.field_name))
+            else:
+                if field.field_type in PRIMITIVE_DESERIALISATION_MAP:
+                    deserializers.append("self.{} = message.{}()".format(field.field_name, PRIMITIVE_DESERIALISATION_MAP[field.field_type]))
+                elif field.field_type == 'time':
+                    deserializers.append("self.{} = (message.getUInt32(), message.getUInt32())".format(field.field_name))
+                elif field.field_type == 'duration':
+                    deserializers.append(
+                        "self.{} = (message.getInt32(), message.getInt32())".format(field.field_name))
+                else:
+                    dependentMessage = self.getMessageFromType(message, field.field_type, messageDB)
+                    type = self.determineAlias(dependentMessage, settings)
+                    deserializers.append("self.{} = {}()".format(field.field_name, type))
+                    deserializers.append("self.{}.deserializeFromMessage(message)".format(field.field_name))
+
+        return "\n        ".join(deserializers)
 
     def checkPackage(self, path):
         if not exists(path):
@@ -344,7 +427,6 @@ class CodeGenerator:
                 self.checkPackage(messagePath)
 
             writeFile("{}/{}.py".format(messagePath, message.name.lower()), source)
-            print(source)
 
     def clear(self):
         self.messages_names.clear()
