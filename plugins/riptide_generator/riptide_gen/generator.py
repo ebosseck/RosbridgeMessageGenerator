@@ -322,21 +322,21 @@ class CodeGenerator:
                         serializers.append("message.{}s(this.{}.ToArray());".format(PRIMITIVE_SERIALISATION_MAP[field.field_type],
                                                                         self.sanitizeFieldName(field.field_name)))
                     elif field.field_type == 'time':
-                        serializers.append("AddArrayLength(message, this.{}.Count);".format(self.sanitizeFieldName(field.field_name)))
+                        serializers.append("message.AddVarULong(this.{}.Count);".format(self.sanitizeFieldName(field.field_name)))
 
                         serializers.append("for (int i = 0; i < this.{}.Count; i++) {{".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("    message.AddUInt(this.{}[i][0]);".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("    message.AddUInt(this.{}[i][1]);".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("}")
                     elif field.field_type == 'duration':
-                        serializers.append("AddArrayLength(message, this.{}.Count);".format(self.sanitizeFieldName(field.field_name)))
+                        serializers.append("message.AddVarULong(this.{}.Count);".format(self.sanitizeFieldName(field.field_name)))
 
                         serializers.append("for (int i = 0; i < this.{}.Count; i++) {{".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("    message.AddInt(this.{}[i][0]);".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("    message.AddInt(this.{}[i][1]);".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("}")
                     else:
-                        serializers.append("AddArrayLength(message, this.{}.Count);".format(self.sanitizeFieldName(field.field_name)))
+                        serializers.append("message.AddVarULong(this.{}.Count);".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("for (int i = 0; i < this.{}.Count; i++) {{".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("    this.{}[i].serializeToMessage(message);".format(self.sanitizeFieldName(field.field_name)))
                         serializers.append("}")
@@ -391,10 +391,10 @@ class CodeGenerator:
                                                                                             PRIMITIVE_DESERIALISATION_MAP[field.field_type]))
                     elif field.field_type == 'time':
                         if not isLengthDeclared:
-                            deserializers.append("int length = ReadArrayLength(message);")
+                            deserializers.append("ulong length = message.GetVarULong();")
                             isLengthDeclared = True
                         else:
-                            deserializers.append("length = ReadArrayLength(message);")
+                            deserializers.append("length = message.GetVarULong();")
 
                         deserializers.append("this.{} = new List<uint[]>();".format(self.sanitizeFieldName(field.field_name)))
                         deserializers.append("for (int i = 0; i < length; i++) {")
@@ -403,10 +403,10 @@ class CodeGenerator:
 
                     elif field.field_type == 'duration':
                         if not isLengthDeclared:
-                            deserializers.append("int length = ReadArrayLength(message);")
+                            deserializers.append("ulong length = message.GetVarULong();")
                             isLengthDeclared = True
                         else:
-                            deserializers.append("length = ReadArrayLength(message);")
+                            deserializers.append("length = message.GetVarULong();")
 
                         deserializers.append("this.{} = new List<int[]>();".format(self.sanitizeFieldName(field.field_name)))
                         deserializers.append("for (int i = 0; i < length; i++) {")
@@ -416,10 +416,10 @@ class CodeGenerator:
                         deserializers.append("}")
                     else:
                         if not isLengthDeclared:
-                            deserializers.append("int length = ReadArrayLength(message);")
+                            deserializers.append("ulong length = message.GetVarULong();")
                             isLengthDeclared = True
                         else:
-                            deserializers.append("length = ReadArrayLength(message);")
+                            deserializers.append("length = message.GetVarULong();")
 
                         dependentMessage = self.getMessageFromType(message, field.field_type, messageDB)
                         type = self.determineAlias(dependentMessage, settings)

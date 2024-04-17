@@ -270,19 +270,19 @@ class CodeGenerator:
                         serializers.append("message.{}Array(self.{})".format(PRIMITIVE_SERIALISATION_MAP[field.field_type],
                                                                         field.field_name))
                     elif field.field_type == 'time':
-                        serializers.append("message.putArrayLength(len(self.{}))".format(field.field_name))
+                        serializers.append("message.putVarULong(len(self.{}))".format(field.field_name))
 
                         serializers.append("for i in range(len(self.{})):".format(field.field_name))
                         serializers.append("    message.putUInt32(self.{}[i][0])".format(field.field_name))
                         serializers.append("    message.putUInt32(self.{}[i][1])".format(field.field_name))
                     elif field.field_type == 'duration':
-                        serializers.append("message.putArrayLength(len(self.{}))".format(field.field_name))
+                        serializers.append("message.putVarULong(len(self.{}))".format(field.field_name))
 
                         serializers.append("for i in range(len(self.{})):".format(field.field_name))
                         serializers.append("    message.putInt32(self.{}[i][0])".format(field.field_name))
                         serializers.append("    message.putInt32(self.{}[i][1])".format(field.field_name))
                     else:
-                        serializers.append("message.putArrayLength(len(self.{}))".format(field.field_name))
+                        serializers.append("message.putVarULong(len(self.{}))".format(field.field_name))
                         serializers.append("for i in range(len(self.{})):".format(field.field_name))
                         serializers.append("    self.{}[i].serializeToMessage(message)".format(field.field_name))
                 else:
@@ -332,20 +332,20 @@ class CodeGenerator:
                         deserializers.append("self.{} = message.{}Array()".format(field.field_name,
                                                                                   PRIMITIVE_DESERIALISATION_MAP[field.field_type]))
                     elif field.field_type == 'time':
-                        deserializers.append("length = message.readArrayLength()")
+                        deserializers.append("length = message.getVarULong()")
 
                         deserializers.append("self.{} = []".format(field.field_name))
                         deserializers.append("for i in range(length):")
                         deserializers.append("    self.{}.append((message.getUInt(), message.getUInt()))".format(field.field_name))
 
                     elif field.field_type == 'duration':
-                        deserializers.append("length = message.readArrayLength()")
+                        deserializers.append("length = message.getVarULong()")
 
                         deserializers.append("self.{} = []".format(field.field_name))
                         deserializers.append("for i in range(length):")
                         deserializers.append("    self.{}.append((message.getInt(), message.getInt()))".format(field.field_name))
                     else:
-                        deserializers.append("length = message.readArrayLength()")
+                        deserializers.append("length = message.getVarULong()")
 
                         deserializers.append("self.{} = []".format(field.field_name))
                         deserializers.append("for i in range(length):")
