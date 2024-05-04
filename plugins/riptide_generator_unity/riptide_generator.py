@@ -24,7 +24,7 @@ class RiptideGenerator(IGenerator):
         """
         :return: the language the generator generates messages for
         """
-        return "C#"
+        return "Unity / C#"
 
     def getUIWidget(self) -> QWidget:
         """

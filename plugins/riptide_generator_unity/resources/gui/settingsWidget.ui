@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>522</width>
-    <height>273</height>
+    <height>301</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,6 +43,9 @@
       </item>
       <item row="3" column="0">
        <widget class="QCheckBox" name="common_base_check">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Common base class</string>
         </property>
@@ -94,6 +97,9 @@
       </item>
       <item row="4" column="0" colspan="2">
        <widget class="QGroupBox" name="groupBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="title">
          <string>Base Class</string>
         </property>

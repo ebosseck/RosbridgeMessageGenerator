@@ -41,7 +41,6 @@ PRIMITIVE_SUFFIX_MAP = {
     "duration": ""
 }
 
-
 PRIMITIVE_DEFAULT_VALUE_MAP = {
     "bool": "false",
     "int8": "0",
@@ -489,7 +488,7 @@ class CodeGenerator:
         for msgID in self.generated_messages:
             source, message = self.generated_messages[msgID]
 
-            messagePath = base_path + "/riptide"
+            messagePath = base_path + "/unity"
 
             if not exists(messagePath):
                 makedirs(messagePath)
@@ -509,4 +508,3 @@ class CodeGenerator:
     def clear(self):
         self.messages_names.clear()
         self.generated_messages.clear()
-
